@@ -1,25 +1,45 @@
 # -*- coding: utf-8 -*-
-def analyze_text(text, include_all_chars=False):
+# 在此文件处编辑代码
+def analyze_text(text):
     """
-    分析文本字符频率，按频率降序、字符升序排列
-    :param text: 输入文本
-    :param include_all_chars: 是否统计所有字符（默认仅统计字母）
-    :return: 排序后的字符列表
-    """
-    char_count = {}
-    for char in text:
-        # 根据参数决定统计范围
-        if include_all_chars or char.isalpha():
-            char_count[char] = char_count.get(char, 0) + 1
+    分析文本中字符频率并按频率降序排列
     
-    # 按频率降序、字符本身升序排序
-    sorted_chars = sorted(char_count, key=lambda x: (-char_count[x], x))
-    return sorted_chars
+    参数:
+    text - 输入的字符串
+    
+    返回:
+    list - 按字符频率降序排列的字符列表
+    """
+    # 只保留字母和汉字，并将字母转换为小写
+    filtered_text = []
+    for char in text:
+        if char.isalpha() or '\u4e00' <= char <= '\u9fff':  # 只保留字母和汉字
+            if char.isalpha():
+                filtered_text.append(char.lower())
+            else:
+                filtered_text.append(char)
+    
+    # 统计字符频率
+    char_count = {}
+    for char in filtered_text:
+        if char in char_count:
+            char_count[char] += 1
+        else:
+            char_count[char] = 1
+    
+    # 按频率降序排序，如果频率相同，按字符本身升序排列
+    sorted_chars = sorted(char_count.items(), key=lambda x: (-x[1], x[0]))
+    
+    # 返回字符列表
+    return [char for char, count in sorted_chars]
 
+# 主程序，已完整
 if __name__ == "__main__":
-    print("===== 文本字符频率分析器 =====")
-    # 读取输入（兼容多行/单行，空行结束）
-    print("请输入文本（输入空行结束）:")
+    print("文本字符频率分析器")
+    print("==================")
+    print("请输入一段文本（输入空行结束）：")
+    
+    # 读取多行输入
     lines = []
     while True:
         try:
@@ -27,20 +47,21 @@ if __name__ == "__main__":
             if line == "":
                 break
             lines.append(line)
-        except (EOFError, KeyboardInterrupt):
-            break  # 捕获异常，避免程序崩溃
+        except EOFError:
+            break
     
-    # 处理输入
-    text = "\n".join(lines).strip()
-    if not text:
-        print("错误：未输入有效文本！")
+    # 合并输入文本
+    text = "\n".join(lines)
+    
+    if not text.strip():
+        print("未输入有效文本！")
     else:
-        # 调用分析函数（默认仅统计字母，可修改为 include_all_chars=True 统计所有字符）
-        result = analyze_text(text)
+        # 分析文本
+        sorted_chars = analyze_text(text)
         
-        # 输出结果
-        print("\n===== 分析结果 =====")
-        if not result:
-            print("未检测到有效字符！")
-        else:
-            print(f"字符按频率降序排列：\n{', '.join(result)}")
+        # 打印结果
+        print("\n字符频率降序排列:")
+        print(", ".join(sorted_chars))
+        
+        # 提示用户比较不同语言
+        print("\n提示：尝试输入中英文文章片段，观察字符频率差异")
